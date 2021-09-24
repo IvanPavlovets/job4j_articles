@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 
 public class RandomArticleGenerator implements ArticleGenerator {
     @Override
-    public SoftReference<Article> generate(List<Word> words) {
+    public Article generate(List<Word> words) {
         var wordsCopy = new ArrayList<>(words);
         Collections.shuffle(wordsCopy);
         var content = wordsCopy.stream()
                 .map(Word::getValue)
                 .collect(Collectors.joining(" "));
-        return new SoftReference<>(new Article(content));
+        return new Article(content);
     }
 }

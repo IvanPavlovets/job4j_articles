@@ -20,16 +20,32 @@ public class SimpleArticleService implements ArticleService {
         this.articleGenerator = articleGenerator;
     }
 
+    /**
+     * В цикле идет сохранение сгенирированых статей в хранилище.
+     *
+     * Расшифровка предыдущего варианта.
+     *
+     * 1) Передаем входящие парметры лябды:
+     * var articles = IntStream.iterate(0, i -> i < count, i -> i + 1)
+     * 2) Сообщение создваемой статьи:
+     * .peek(i -> LOGGER.info("Сгенерирована статья № {}", i))
+     * 3) ко всем элементам stream сгенирировать статью:
+     * .mapToObj((x) -> articleGenerator.generate(words))
+     * 4) Результат потока скомпоновать в List:
+     * .collect(Collectors.toList());
+     * 5) Cохранить все члены списка в articleStore:
+     * articles.forEach(articleStore::save);
+     * @param wordStore
+     * @param count
+     * @param articleStore
+     */
     @Override
     public void generate(Store<Word> wordStore, int count, Store<Article> articleStore) {
         LOGGER.info("Генерацация статей в количестве {}", count);
         var words = wordStore.findAll();
-        var articles = IntStream.iterate(0, i -> i < count, i -> i + 1)
-                .peek(i -> LOGGER.info("Сгенерирована статья № {}", i))
-                .mapToObj((x) -> articleGenerator.generate(words))
-                .collect(Collectors.toList());
-        for (var i : articles) {
-            articleStore.save(i.get());
+        for (int i = 0; i < count; i++) {
+            articleStore.save(articleGenerator.generate(words));
+            LOGGER.info("Сгенерирована статья № {}", i);
         }
     }
 }
